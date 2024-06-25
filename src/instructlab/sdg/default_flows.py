@@ -9,6 +9,7 @@ import os
 from .filterblock import FilterByValueBlock
 from .iterblock import IterBlock
 from .llmblock import LLMBlock
+import instructlab.sdg.utils as utils
 
 
 class Flow(ABC):
@@ -24,6 +25,7 @@ class Flow(ABC):
 class MMLUBenchFlow(Flow):
     def get_flow(self) -> list:
         sdg_base = resources.files(__package__)
+        model_prompt = "<s> [INST] {prompt} [/INST]" if utils.get_model_family(None, self.model_id) == "mixtral" else "{prompt}"
         return [
             {
                 "block_type": LLMBlock,
@@ -34,7 +36,7 @@ class MMLUBenchFlow(Flow):
                     ),
                     "client": self.client,
                     "model_id": self.model_id,
-                    "model_prompt": "<s> [INST] {prompt} [/INST]",
+                    "model_prompt": model_prompt,
                     "output_cols": ["mmlubench_question", "mmlubench_answer"],
                     "batch_kwargs": {
                         "num_procs": 8,
@@ -53,6 +55,7 @@ class MMLUBenchFlow(Flow):
 class SynthKnowledgeFlow(Flow):
     def get_flow(self) -> list:
         sdg_base = resources.files(__package__)
+        model_prompt = "<s> [INST] {prompt} [/INST]" if utils.get_model_family(None, self.model_id) == "mixtral" else "{prompt}"
         return [
             {
                 "block_type": LLMBlock,
@@ -63,7 +66,7 @@ class SynthKnowledgeFlow(Flow):
                     ),
                     "client": self.client,
                     "model_id": self.model_id,
-                    "model_prompt": "<s> [INST] {prompt} [/INST]",
+                    "model_prompt": model_prompt,
                     "output_cols": ["question", "response"],
                     "batch_kwargs": {
                         "num_procs": 8,
@@ -84,7 +87,7 @@ class SynthKnowledgeFlow(Flow):
                     ),
                     "client": self.client,
                     "model_id": self.model_id,
-                    "model_prompt": "<s> [INST] {prompt} [/INST]",
+                    "model_prompt": model_prompt,
                     "output_cols": ["explanation", "judgment"],
                     "batch_kwargs": {
                         "num_procs": 8,
@@ -117,7 +120,7 @@ class SynthKnowledgeFlow(Flow):
                     ),
                     "client": self.client,
                     "model_id": self.model_id,
-                    "model_prompt": "<s> [INST] {prompt} [/INST]",
+                    "model_prompt": model_prompt,
                     "output_cols": ["feedback", "score"],
                     "batch_kwargs": {
                         "num_procs": 8,
@@ -150,7 +153,7 @@ class SynthKnowledgeFlow(Flow):
                     ),
                     "client": self.client,
                     "model_id": self.model_id,
-                    "model_prompt": "<s> [INST] {prompt} [/INST]",
+                    "model_prompt": model_prompt,
                     "output_cols": ["explanation", "rating"],
                     "batch_kwargs": {
                         "num_procs": 8,
