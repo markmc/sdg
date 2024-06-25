@@ -9,6 +9,7 @@ import json
 import logging
 import math
 import os
+import re
 import sys
 
 # Third Party
@@ -23,6 +24,16 @@ StrOrOpenAIObject = Union[str, object]
 
 DEFAULT_CHUNK_OVERLAP = 100
 
+# When otherwise unknown, ilab uses this as the default family
+DEFAULT_MODEL_FAMILY = "merlinite"
+
+# Model families understood by ilab
+MODEL_FAMILIES = set(("merlinite", "mixtral"))
+
+# Map model names to their family
+MODEL_FAMILY_MAPPINGS = {
+    "granite": "merlinite",
+}
 
 
 class GenerateException(Exception):
@@ -305,3 +316,15 @@ def chunk_document(documents: List, server_ctx_size, chunk_word_count) -> List[s
         content.extend([item.page_content for item in temp])
 
     return content
+
+
+def get_model_family(forced, model_path):
+    forced = MODEL_FAMILY_MAPPINGS.get(forced, forced)
+    if forced and forced.lower() not in MODEL_FAMILIES:
+        raise Exception("Unknown model family: %s" % forced)
+
+    # Try to guess the model family based on the model's filename
+    guess = re.match(r"^\w*", os.path.basename(model_path)).group(0).lower()
+    guess = MODEL_FAMILY_MAPPINGS.get(guess, guess)
+
+    return guess if guess in MODEL_FAMILIES else DEFAULT_MODEL_FAMILY
