@@ -24,6 +24,7 @@ StrOrOpenAIObject = Union[str, object]
 DEFAULT_CHUNK_OVERLAP = 100
 
 
+
 class GenerateException(Exception):
     """An exception raised during generate step."""
 

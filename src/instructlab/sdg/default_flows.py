@@ -5,11 +5,13 @@ from importlib import resources
 import operator
 import os
 
+# First Party
+import instructlab.sdg.utils as utils
+
 # Local
 from .filterblock import FilterByValueBlock
 from .iterblock import IterBlock
 from .llmblock import LLMBlock
-import instructlab.sdg.utils as utils
 
 
 class Flow(ABC):
@@ -25,7 +27,11 @@ class Flow(ABC):
 class MMLUBenchFlow(Flow):
     def get_flow(self) -> list:
         sdg_base = resources.files(__package__)
-        model_prompt = "<s> [INST] {prompt} [/INST]" if utils.get_model_family(None, self.model_id) == "mixtral" else "{prompt}"
+        model_prompt = (
+            "<s> [INST] {prompt} [/INST]"
+            if utils.get_model_family(None, self.model_id) == "mixtral"
+            else "{prompt}"
+        )
         return [
             {
                 "block_type": LLMBlock,
@@ -55,7 +61,11 @@ class MMLUBenchFlow(Flow):
 class SynthKnowledgeFlow(Flow):
     def get_flow(self) -> list:
         sdg_base = resources.files(__package__)
-        model_prompt = "<s> [INST] {prompt} [/INST]" if utils.get_model_family(None, self.model_id) == "mixtral" else "{prompt}"
+        model_prompt = (
+            "<s> [INST] {prompt} [/INST]"
+            if utils.get_model_family(None, self.model_id) == "mixtral"
+            else "{prompt}"
+        )
         return [
             {
                 "block_type": LLMBlock,

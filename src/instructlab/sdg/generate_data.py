@@ -28,7 +28,6 @@ from instructlab.sdg import SDG, utils
 from instructlab.sdg.default_flows import MMLUBenchFlow, SynthKnowledgeFlow
 from instructlab.sdg.pipeline import Pipeline
 
-
 _WORD_DENYLIST = [
     "image",
     "images",
