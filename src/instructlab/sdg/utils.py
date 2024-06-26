@@ -321,7 +321,7 @@ def chunk_document(documents: List, server_ctx_size, chunk_word_count) -> List[s
 def get_model_family(forced, model_path):
     forced = MODEL_FAMILY_MAPPINGS.get(forced, forced)
     if forced and forced.lower() not in MODEL_FAMILIES:
-        raise Exception("Unknown model family: %s" % forced)
+        raise GenerateException("Unknown model family: %s" % forced)
 
     # Try to guess the model family based on the model's filename
     guess = re.match(r"^\w*", os.path.basename(model_path)).group(0).lower()
