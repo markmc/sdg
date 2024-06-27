@@ -171,18 +171,21 @@ def generate_data(
     # about whether we can turn this on (whether vllm is used or not)
     batched = False
 
-    sdg = None
+    flow_types = []
     if profile == "full":
-        mmlu_flow = MMLUBenchFlow(client, model_name, batched).get_flow()
-        mmlu_pipe = Pipeline(mmlu_flow)
-        knowledge_flow = SynthKnowledgeFlow(client, model_name, batched).get_flow()
-        knowledge_pipe = Pipeline(knowledge_flow)
-        sdg = SDG([mmlu_pipe, knowledge_pipe])
+        flow_types.append(MMLUBenchFlow)
+        flow_types.append(SynthKnowledgeFlow)
     elif profile == "simple":
-        knowledge_flow = SimpleKnowledgeFlow(client, model_name, batched).get_flow()
-        sdg = SDG([Pipeline(knowledge_flow)])
+        flow_types.append(SimpleKnowledgeFlow)
     else:
         raise SystemExit(f"Error: profile ({profile}) is not supported.")
+
+    sdg = SDG(
+        [
+            Pipeline(flow_type(client, model_name, batched).get_flow())
+            for flow_type in flow_types
+        ]
+    )
 
     if console_output:
         logger.info(
