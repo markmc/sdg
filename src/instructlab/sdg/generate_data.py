@@ -25,7 +25,7 @@ from instructlab.sdg.default_flows import (
     SynthKnowledgeFlow,
 )
 from instructlab.sdg.pipeline import Pipeline
-from instructlab.sdg.taxonomy import read_taxonomy
+from instructlab.sdg.taxonomy import leaf_node_to_samples, read_taxonomy_leaf_nodes
 
 _WORD_DENYLIST = [
     "image",
@@ -125,28 +125,15 @@ def generate_data(
     # TODO need to update the CLI to specify which profile to use (simple or full at the moment)
     profile: Optional[str] = "simple",
 ):
-    seed_instruction_data = []
     generate_start = time.time()
 
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
 
-    # check taxonomy first then seed_tasks_path
-    # throw an error if both not found
-    # pylint: disable=broad-exception-caught,raise-missing-from
-    if taxonomy and os.path.exists(taxonomy):
-        # TODO -- rewrite how this returns data so we don't have to do
-        # so much transformation on it
-        seed_instruction_data = read_taxonomy(taxonomy, taxonomy_base, yaml_rules)
-    else:
+    if not (taxonomy and os.path.exists(taxonomy)):
         raise SystemExit(f"Error: taxonomy ({taxonomy}) does not exist.")
 
-    # Transform into a more convenient format to feed into our updated SDG library
-    leaf_nodes = {}
-    for seed in seed_instruction_data:
-        node = leaf_nodes.setdefault(seed["taxonomy_path"], [])
-        node.append(seed)
-        leaf_nodes[seed["taxonomy_path"]] = node
+    leaf_nodes = read_taxonomy_leaf_nodes(taxonomy, taxonomy_base, yaml_rules)
 
     name = Path(model_name).stem  # Just in case it is a file path
     date_suffix = datetime.now().replace(microsecond=0).isoformat().replace(":", "_")
@@ -188,41 +175,7 @@ def generate_data(
         )
 
     for leaf_node in leaf_nodes.values():
-        # TODO -- only handles knowledge leaf nodes, need to add support for other types
-        if leaf_node[0].get("document") is None:
-            logger.error("Only knowledge leaf nodes supported at the moment")
-            continue
-
-        samples = [{}]
-        # pylint: disable=consider-using-enumerate
-        for i in range(len(leaf_node)):
-            samples[-1].setdefault("task_description", leaf_node[i]["task_description"])
-            samples[-1].setdefault("document", leaf_node[i]["document"])
-            # TODO - fix read_taxonomy() to return the domain. It's not included right now.
-            samples[-1].setdefault("domain", leaf_node[i].get("domain", "general"))
-            if "question_3" in samples[-1]:
-                samples.append({})
-            if "question_1" not in samples[-1]:
-                samples[-1]["question_1"] = leaf_node[i]["instruction"]
-                samples[-1]["response_1"] = leaf_node[i]["output"]
-            elif "question_2" not in samples[-1]:
-                samples[-1]["question_2"] = leaf_node[i]["instruction"]
-                samples[-1]["response_2"] = leaf_node[i]["output"]
-            else:
-                samples[-1]["question_3"] = leaf_node[i]["instruction"]
-                samples[-1]["response_3"] = leaf_node[i]["output"]
-        # wrap back around to the beginning if the number of examples was not
-        # evenly divisble by 3
-        if "question_2" not in samples[-1]:
-            samples[-1]["question_2"] = leaf_node[0]["instruction"]
-            samples[-1]["response_2"] = leaf_node[0]["output"]
-        if "question_3" not in samples[-1]:
-            samples[-1]["question_3"] = leaf_node[1 if len(leaf_node) > 1 else 0][
-                "instruction"
-            ]
-            samples[-1]["response_3"] = leaf_node[1 if len(leaf_node) > 1 else 0][
-                "output"
-            ]
+        samples = leaf_node_to_samples(leaf_node)
 
         # TODO this is broken, just trying to get initial integration to run
         # pylint: disable=consider-using-enumerate
