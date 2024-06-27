@@ -28,16 +28,6 @@ from instructlab.sdg.pipeline import Pipeline
 from instructlab.sdg.taxonomy import leaf_node_to_samples, read_taxonomy_leaf_nodes
 
 
-def writeline2file(logfile, line):
-    t = datetime.now().replace(microsecond=0).isoformat()
-    with open(logfile, "a", encoding="utf-8") as fp:
-        fp.write(f"{t} - {line}\n")
-
-
-def find_word_in_string(w, s):
-    return re.compile(r"\b({0})\b".format(w), flags=re.IGNORECASE).search(s)
-
-
 def unescape(s):
     return bytes(s, "utf-8").decode("utf-8")
 
