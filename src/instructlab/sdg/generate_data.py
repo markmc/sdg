@@ -13,7 +13,7 @@ import time
 # instructlab - All of these need to go away (other than sdg) - issue #6
 from datasets import Dataset
 import httpx
-import instructlab.utils
+from instructlab.utils import get_sysprompt
 import openai
 
 # First Party
@@ -41,7 +41,7 @@ def _gen_train_data(logger, machine_instruction_data, output_file_train):
             user += "\n" + synth_example["input"]
         train_data.append(
             {
-                "system": utils.get_sysprompt(),
+                "system": get_sysprompt(),
                 "user": _unescape(user),
                 "assistant": _unescape(synth_example["output"]),
             }
