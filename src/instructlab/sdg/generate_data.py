@@ -28,7 +28,7 @@ from instructlab.sdg.pipeline import Pipeline
 from instructlab.sdg.taxonomy import leaf_node_to_samples, read_taxonomy_leaf_nodes
 
 
-def unescape(s):
+def _unescape(s):
     return bytes(s, "utf-8").decode("utf-8")
 
 
@@ -42,8 +42,8 @@ def _gen_train_data(logger, machine_instruction_data, output_file_train):
         train_data.append(
             {
                 "system": utils.get_sysprompt(),
-                "user": unescape(user),
-                "assistant": unescape(synth_example["output"]),
+                "user": _unescape(user),
+                "assistant": _unescape(synth_example["output"]),
             }
         )
     # utils.jdump(train_data, output_file_train)
