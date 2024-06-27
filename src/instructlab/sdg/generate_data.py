@@ -12,13 +12,13 @@ import time
 # Third Party
 # instructlab - All of these need to go away (other than sdg) - issue #6
 from datasets import Dataset
-import httpx
 from instructlab.utils import get_sysprompt
+import httpx
 import openai
 
 # First Party
 # pylint: disable=ungrouped-imports
-from instructlab.sdg import SDG, utils
+from instructlab.sdg import SDG
 from instructlab.sdg.default_flows import (
     MMLUBenchFlow,
     SimpleKnowledgeFlow,
@@ -26,6 +26,7 @@ from instructlab.sdg.default_flows import (
 )
 from instructlab.sdg.pipeline import Pipeline
 from instructlab.sdg.taxonomy import leaf_node_to_samples, read_taxonomy_leaf_nodes
+from instructlab.sdg.utils import chunking
 
 
 def _unescape(s):
@@ -46,7 +47,7 @@ def _gen_train_data(logger, machine_instruction_data, output_file_train):
                 "assistant": _unescape(synth_example["output"]),
             }
         )
-    # utils.jdump(train_data, output_file_train)
+    # utils_json.jdump(train_data, output_file_train)
     with open(output_file_train, "w", encoding="utf-8") as outfile:
         for entry in train_data:
             json.dump(entry, outfile, ensure_ascii=False)
@@ -149,7 +150,7 @@ def generate_data(
         # TODO this is broken, just trying to get initial integration to run
         # pylint: disable=consider-using-enumerate
         for i in range(len(samples)):
-            samples[i]["document"] = utils.chunk_document(
+            samples[i]["document"] = chunking.chunk_document(
                 documents=samples[i]["document"],
                 server_ctx_size=server_ctx_size,
                 chunk_word_count=chunk_word_count,

@@ -6,7 +6,7 @@ import operator
 import os
 
 # First Party
-from instructlab.sdg import utils
+from instructlab.sdg.utils import models
 
 # Local
 from .filterblock import FilterByValueBlock
@@ -20,7 +20,7 @@ MODEL_PROMPT_MERLINITE = "'<|system|>\nYou are an AI language model developed by
 def _get_model_prompt(model_id):
     return (
         MODEL_PROMPT_MIXTRAL
-        if utils.get_model_family(None, model_id) == "mixtral"
+        if models.get_model_family(None, model_id) == "mixtral"
         else MODEL_PROMPT_MERLINITE
     )
 
