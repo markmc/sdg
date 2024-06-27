@@ -25,6 +25,7 @@ from instructlab.sdg.default_flows import (
     SynthKnowledgeFlow,
 )
 from instructlab.sdg.pipeline import Pipeline
+from instructlab.sdg.taxonomy import read_taxonomy
 
 _WORD_DENYLIST = [
     "image",
@@ -56,10 +57,6 @@ def writeline2file(logfile, line):
 
 def find_word_in_string(w, s):
     return re.compile(r"\b({0})\b".format(w), flags=re.IGNORECASE).search(s)
-
-
-def read_taxonomy(*args, **kwargs):
-    return instructlab.utils.read_taxonomy(*args, **kwargs)
 
 
 def unescape(s):
@@ -140,9 +137,7 @@ def generate_data(
     if taxonomy and os.path.exists(taxonomy):
         # TODO -- rewrite how this returns data so we don't have to do
         # so much transformation on it
-        seed_instruction_data = read_taxonomy(
-            logger, taxonomy, taxonomy_base, yaml_rules
-        )
+        seed_instruction_data = read_taxonomy(taxonomy, taxonomy_base, yaml_rules)
     else:
         raise SystemExit(f"Error: taxonomy ({taxonomy}) does not exist.")
 
