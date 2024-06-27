@@ -27,27 +27,6 @@ from instructlab.sdg.default_flows import (
 from instructlab.sdg.pipeline import Pipeline
 from instructlab.sdg.taxonomy import leaf_node_to_samples, read_taxonomy_leaf_nodes
 
-_WORD_DENYLIST = [
-    "image",
-    "images",
-    "graph",
-    "graphs",
-    "picture",
-    "pictures",
-    "file",
-    "files",
-    "map",
-    "maps",
-    "draw",
-    "plot",
-    "go to",
-    "video",
-    "audio",
-    "music",
-    "flowchart",
-    "diagram",
-]
-
 
 def writeline2file(logfile, line):
     t = datetime.now().replace(microsecond=0).isoformat()
